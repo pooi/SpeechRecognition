@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import wave
 import sys
+import operator
 
 class SpeechRecognition:
 
@@ -219,6 +220,17 @@ class SpeechRecognition:
 
         return normalizeGraph
 
+    def getAccumulateList(self, graph):
+        accumulateGraph = []
+        for i in range(len(graph)):
+            accumulateGraph.append(abs(graph[i]))
+
+        for i in range(len(accumulateGraph)):
+            if i > 0:
+                accumulateGraph[i] = accumulateGraph[i] + accumulateGraph[i - 1]
+
+        return accumulateGraph
+
     def getGraphAccumulateSlopeList(self, graph):
         """
         1. 파형 그래프의 값들을 누적시키고
@@ -279,3 +291,172 @@ class SpeechRecognition:
             calculateGraph.append(originalGraph[i])
 
         return calculateGraph
+
+    def getFFTAreaRatio(self, graph):
+
+        lf = abs(np.fft.rfft(graph)) / len(graph)
+        # lf = abs(np.fft.rfft(calculateGraph))
+        list = lf.tolist()
+
+        area = 0
+        area1 = 0
+        area2 = 0
+        area3 = 0
+        area4 = 0
+        area5 = 0
+        area6 = 0
+        area7 = 0
+
+        for i in range(len(list)):
+            if 1 < i and i <= 5.5:
+                area1 += list[i]
+            elif 5.5 < i and i <= 10:
+                area2 += list[i]
+            elif 10 < i and i <= 55:
+                area3 += list[i]
+            elif 55 < i and i <= 100:
+                area4 += list[i]
+            elif 100 < i and i <= 550:
+                area5 += list[i]
+            elif 550 < i and i <= 1000:
+                area6 += list[i]
+            elif 1000 < i:
+                area7 += list[i]
+            area += list[i]
+
+        areaList = {}
+        areaList[1] = area1/area * 100
+        areaList[2] = area2/area * 100
+        areaList[3] = area3/area * 100
+        areaList[4] = area4/area * 100
+        areaList[5] = area5/area * 100
+        areaList[6] = area6/area * 100
+        areaList[7] = area7/area * 100
+
+        return areaList
+
+    def twoHalves(self, graph):
+        sum = 0
+        sum1 = 0
+        sum2 = 0
+        for i in range(len(graph)):
+            if i < len(graph) / 2:
+                sum1 += abs(graph[i])
+            else:
+                sum2 += abs(graph[i])
+            sum += abs(graph[i])
+
+        return (sum1/sum*100, sum2/sum*100)
+
+    def getAreaRatio(self, graph):
+        area = self.getArea(graph)
+        total = len(graph) * 200
+        return area/total*100
+
+    def getBelow25Ratio(self, graph):
+        count = 0
+        for i in range(len(graph)):
+            c = abs(graph[i])
+            if c <= 25:
+                count += 1
+        return count/len(graph)*100
+
+    def getLRBelow10Ratio(self, graph):
+        sum = 0
+        sum1 = 0
+        sum2 = 0
+        sum3 = 0
+        sum4 = 0
+        sum5 = 0
+        for i in range(len(graph)):
+            c = abs(graph[i])
+            if i < len(graph) * 1 / 5:
+                sum1 += c
+            elif i < len(graph) * 2 / 5:
+                sum2 += c
+            elif i < len(graph) * 3 / 5:
+                sum3 += c
+            elif i < len(graph) * 4 / 5:
+                sum4 += c
+            else:
+                sum5 += c
+            sum += c
+
+        left = sum1 / sum * 100
+        right = sum5 / sum * 100
+
+        return left, right
+
+    def threeQuartersRatio(self, graph):
+        sum = 0
+        sum1 = 0
+        sum2 = 0
+        sum3 = 0
+        for i in range(len(graph)):
+            c = abs(graph[i])
+            if i < len(graph) * 1 / 3:
+                sum1 += c
+            elif i < len(graph) * 2 / 3:
+                sum2 += c
+            else:
+                sum3 += c
+            sum += c
+
+        return (sum1/sum*100, sum2/sum*100, sum3/sum*100)
+
+    def recognition(self, path):
+
+        basicGraph = self.getBasicGraph(path)
+
+        # 정규화
+        normalizeGraph = self.normalization(basicGraph)
+
+        # 누적 그래프의 기울기 리스트
+        slopeGraph = self.getGraphAccumulateSlopeList(normalizeGraph)
+
+        # 실제 소리부분 그래프 추출
+        calculateGraph = self.findRealGraph(normalizeGraph, slopeGraph)
+
+        # 푸리에 변환으로 7개 비율 구함
+        groupList = self.getFFTAreaRatio(calculateGraph)
+        groupList = sorted(groupList.items(), key=operator.itemgetter(1), reverse=True)
+
+        firstIndex = groupList[0][0]
+        secondIndex = groupList[1][0]
+
+        if firstIndex == 5:
+            if secondIndex == 6:
+                below25 = self.getBelow25Ratio(calculateGraph)
+                left, right = self.getLRBelow10Ratio(calculateGraph)
+                first, second, third = self.threeQuartersRatio(calculateGraph)
+
+                if first >= 40:
+                    print("8")
+                elif below25 <= 75:
+                    print("6")
+                elif left < 10 and right < 10:
+                    print("0")
+                else:
+                    print("4")
+            else:
+                areaRatio = self.getAreaRatio(calculateGraph)
+                below25 = self.getBelow25Ratio(calculateGraph)
+                first, second, third = self.threeQuartersRatio(calculateGraph)
+
+                if areaRatio >= 85:
+                    print("9")
+                elif second >= 50:
+                    print("5")
+                elif below25 <= 75:
+                    print("1")
+                else:
+                    print("3")
+        else:
+            left, right = self.twoHalves(calculateGraph)
+
+            if left < right:
+                print("2")
+            else:
+                print("7")
+
+

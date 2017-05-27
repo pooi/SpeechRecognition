@@ -11,9 +11,24 @@ while(True):
     path = input("input : ")
 
     if path == 'q' or path == 'Q':
-        break;
+        break
 
-    speech.recognition(path)
+    basicGraph = speech.getBasicGraph(path)
+
+    basicGraph = speech.changeAmplitude(basicGraph, 3)
+
+    # 정규화
+    normalizeGraph = speech.normalization(basicGraph)
+
+    # 누적 그래프의 기울기 리스트
+    slopeGraph = speech.getGraphAccumulateSlopeList(normalizeGraph)
+
+    # 실제 소리부분 그래프 추출
+    calculateGraph = speech.findRealGraph(normalizeGraph, slopeGraph)
+
+    speech.getCircle(calculateGraph)
+
+    # speech.recognition(path)
 
 # for j in range(10):
 #     file = '0' + str(j)

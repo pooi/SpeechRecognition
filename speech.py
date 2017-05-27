@@ -77,7 +77,104 @@ class SpeechRecognition:
 
         return line
 
-    def getArea(self, list):
+    # def getArea(self, list):
+    #     """
+    #     4개의 직선의 방적식으로 둘러싸인 영역의 넓이를 구하는 함수
+    #     :param list: 파형 그래프
+    #     :return: 영역의 넓이 값
+    #     """
+    #     start = {}  # 시작 x,y 좌표
+    #     finish = {}  # 종료 x,y 좌표
+    #     max = {}  # 최댓값 x,y 좌표
+    #     min = {}  # 최소값 x,y 좌표
+    #
+    #     start['x'] = 0
+    #     start['y'] = list[0]
+    #     # start[0] = list[0]
+    #     finish['x'] = len(list) - 1
+    #     finish['y'] = list[len(list) - 1]
+    #     # finish[len(list) - 1] = list[len(list) - 1]
+    #
+    #     maxValue = 0
+    #     minValue = 0
+    #
+    #     for i in range(len(list)):
+    #         s = int(list[i])
+    #
+    #         if maxValue < s:
+    #             max.clear()
+    #             max['x'] = i
+    #             max['y'] = s
+    #             # max[i] = s
+    #             maxValue = s
+    #
+    #         if minValue > s:
+    #             min.clear()
+    #             min['x'] = i
+    #             min['y'] = s
+    #             # min[i] = s
+    #             minValue = s
+    #
+    #             # print("x : ", i, ", y : ", sig[i])
+    #
+    #     # print(start)
+    #     # print(finish)
+    #     # print(max)
+    #     # print(min)
+    #
+    #     lineLT = self.getLineFunc(start, max)  # find left-top line
+    #     lineRT = self.getLineFunc(max, finish)  # find right-top line
+    #     lineLB = self.getLineFunc(start, min)  # find left-bottom line
+    #     lineRB = self.getLineFunc(min, finish)  # find right-bottom line
+    #
+    #     # print(lineLT)
+    #     # print(lineRT)
+    #     # print(lineLB)
+    #     # print(lineRB)
+    #
+    #     # calculate total area
+    #     totalArea = 0.0
+    #     totalGraph = []
+    #
+    #     for i in range(len(list)):
+    #
+    #         line1 = {}
+    #         line2 = {}
+    #
+    #         # find current top line from two top line
+    #         topMax = lineLT['max']
+    #         if i < topMax:
+    #             line1 = lineLT
+    #         else:
+    #             line1 = lineRT
+    #
+    #         # find current bottom line from two bottom line
+    #         botMax = lineLB['max']
+    #         if i < botMax:
+    #             line2 = lineLB
+    #         else:
+    #             line2 = lineRB
+    #
+    #         topA = line1['a']  # top line 기울기
+    #         topB = line1['b']  # top line y절편
+    #
+    #         botA = line2['a']  # bottom line 기울기
+    #         botB = line2['b']  # bottom line y절편
+    #
+    #         # y = ax + b
+    #         topDistance = topA * i + topB
+    #         botDistance = botA * i + botB
+    #
+    #         area = abs(topDistance) + abs(botDistance)
+    #
+    #         totalArea += area
+    #         totalGraph.append(totalArea)  # option
+    #
+    #     # printGraph(totalGraph, title=file) # option
+    #
+    #     return totalArea
+
+    def getArea2(self, list):
         """
         4개의 직선의 방적식으로 둘러싸인 영역의 넓이를 구하는 함수
         :param list: 파형 그래프
@@ -85,8 +182,12 @@ class SpeechRecognition:
         """
         start = {}  # 시작 x,y 좌표
         finish = {}  # 종료 x,y 좌표
-        max = {}  # 최댓값 x,y 좌표
-        min = {}  # 최소값 x,y 좌표
+        max1 = {}  # 최댓값 x,y 좌표
+        min1 = {}  # 최소값 x,y 좌표
+        max2 = {}  # 최댓값 x,y 좌표
+        min2 = {}  # 최소값 x,y 좌표
+        max3 = {}  # 최댓값 x,y 좌표
+        min3 = {}  # 최소값 x,y 좌표
 
         start['x'] = 0
         start['y'] = list[0]
@@ -95,37 +196,71 @@ class SpeechRecognition:
         finish['y'] = list[len(list) - 1]
         # finish[len(list) - 1] = list[len(list) - 1]
 
+
         maxValue = 0
         minValue = 0
-
-        for i in range(len(list)):
+        for i in range( 0, int(len(list)*1/3) ):
             s = int(list[i])
 
             if maxValue < s:
-                max.clear()
-                max['x'] = i
-                max['y'] = s
+                max1.clear()
+                max1['x'] = i
+                max1['y'] = s
                 # max[i] = s
                 maxValue = s
 
             if minValue > s:
-                min.clear()
-                min['x'] = i
-                min['y'] = s
+                min1.clear()
+                min1['x'] = i
+                min1['y'] = s
                 # min[i] = s
                 minValue = s
 
-                # print("x : ", i, ", y : ", sig[i])
+        maxValue = 0
+        minValue = 0
+        for i in range( int(len(list)*1/3), int(len(list)*2/3) ):
+            s = int(list[i])
 
-        # print(start)
-        # print(finish)
-        # print(max)
-        # print(min)
+            if maxValue < s:
+                max2.clear()
+                max2['x'] = i
+                max2['y'] = s
+                # max[i] = s
+                maxValue = s
 
-        lineLT = self.getLineFunc(start, max)  # find left-top line
-        lineRT = self.getLineFunc(max, finish)  # find right-top line
-        lineLB = self.getLineFunc(start, min)  # find left-bottom line
-        lineRB = self.getLineFunc(min, finish)  # find right-bottom line
+            if minValue > s:
+                min2.clear()
+                min2['x'] = i
+                min2['y'] = s
+                # min[i] = s
+                minValue = s
+
+        maxValue = 0
+        minValue = 0
+        for i in range( int(len(list)*2/3), int(len(list)) ):
+            s = int(list[i])
+            if maxValue < s:
+                max3.clear()
+                max3['x'] = i
+                max3['y'] = s
+                # max[i] = s
+                maxValue = s
+
+            if minValue > s:
+                min3.clear()
+                min3['x'] = i
+                min3['y'] = s
+                # min[i] = s
+                minValue = s
+
+        lineLT = self.getLineFunc(start, max1)  # find left-top line
+        lineCLT = self.getLineFunc(max1, max2)
+        lineCRT = self.getLineFunc(max2, max3)
+        lineRT = self.getLineFunc(max3, finish)  # find right-top line
+        lineLB = self.getLineFunc(start, min1)  # find left-bottom line
+        lineCLB = self.getLineFunc(min1, min2)
+        lineCRB = self.getLineFunc(min2, min3)
+        lineRB = self.getLineFunc(min3, finish)  # find right-bottom line
 
         # print(lineLT)
         # print(lineRT)
@@ -135,53 +270,74 @@ class SpeechRecognition:
         # calculate total area
         totalArea = 0.0
         totalGraph = []
+        topGraph = []
 
-        for i in range(len(list)):
+        preTopMax = 0
+        preBotMax = 0
+        checkT = 0
+        checkB = 0
+        lineT = lineLT
+        lineB = lineLB
+        for i in range(len(list)-1):
 
-            line1 = {}
-            line2 = {}
 
             # find current top line from two top line
-            topMax = lineLT['max']
+            topMax = lineT['max']
             if i < topMax:
-                line1 = lineLT
+                pass
             else:
-                line1 = lineRT
+                preTopMax = topMax
+                checkT += 1
+                if checkT == 1:
+                    lineT = lineCLT
+                elif checkT == 2:
+                    lineT = lineCRT
+                elif checkT == 3:
+                    lineT = lineRT
 
             # find current bottom line from two bottom line
-            botMax = lineLB['max']
+            botMax = lineB['max']
             if i < botMax:
-                line2 = lineLB
+                pass
             else:
-                line2 = lineRB
+                preBotMax = botMax
+                checkB += 1
+                if checkB == 1:
+                    lineB = lineCLB
+                elif checkB == 2:
+                    lineB = lineCRB
+                elif checkB == 3:
+                    lineB = lineRB
 
-            topA = line1['a']  # top line 기울기
-            topB = line1['b']  # top line y절편
+            topA = lineT['a']  # top line 기울기
+            topB = lineT['b']  # top line y절편
 
-            botA = line2['a']  # bottom line 기울기
-            botB = line2['b']  # bottom line y절편
+            botA = lineB['a']  # bottom line 기울기
+            botB = lineB['b']  # bottom line y절편
 
             # y = ax + b
-            topDistance = topA * i + topB
-            botDistance = botA * i + botB
+            topDistance = topA * (i-preTopMax) + topB
+            botDistance = botA * (i-preBotMax) + botB
+
+            topGraph.append(topDistance)
 
             area = abs(topDistance) + abs(botDistance)
 
             totalArea += area
             totalGraph.append(totalArea)  # option
 
-        # printGraph(totalGraph, title=file) # option
+        # self.printGraph(topGraph) # option
 
         return totalArea
 
-    def changeAmplitude(self, graph):
+    def changeAmplitude(self, graph, ratio):
         """
         진폭 수정
         :param graph: 파형 그래프 값
         :return: 진폭이 수정된 파형 그래프 값
         """
         for i in range(len(graph)):
-            graph[i] *= 1
+            graph[i] *= ratio
 
         return graph
 
@@ -348,8 +504,13 @@ class SpeechRecognition:
 
         return (sum1/sum*100, sum2/sum*100)
 
-    def getAreaRatio(self, graph):
-        area = self.getArea(graph)
+    # def getAreaRatio(self, graph):
+    #     area = self.getArea(graph)
+    #     total = len(graph) * 200
+    #     return area/total*100
+
+    def getAreaRatio2(self, graph):
+        area = self.getArea2(graph)
         total = len(graph) * 200
         return area/total*100
 
@@ -368,22 +529,25 @@ class SpeechRecognition:
         sum3 = 0
         sum4 = 0
         sum5 = 0
+        sum6 = 0
         for i in range(len(graph)):
             c = abs(graph[i])
-            if i < len(graph) * 1 / 5:
+            if i < len(graph) * 1 / 6:
                 sum1 += c
-            elif i < len(graph) * 2 / 5:
+            elif i < len(graph) * 2 / 6:
                 sum2 += c
-            elif i < len(graph) * 3 / 5:
+            elif i < len(graph) * 3 / 6:
                 sum3 += c
-            elif i < len(graph) * 4 / 5:
+            elif i < len(graph) * 4 / 6:
                 sum4 += c
-            else:
+            elif i < len(graph) * 5 / 6:
                 sum5 += c
+            else:
+                sum6 += c
             sum += c
 
         left = sum1 / sum * 100
-        right = sum5 / sum * 100
+        right = sum6 / sum * 100
 
         return left, right
 
@@ -404,9 +568,19 @@ class SpeechRecognition:
 
         return (sum1/sum*100, sum2/sum*100, sum3/sum*100)
 
+    def getCircle(self, graph):
+
+        sum = 0
+        for i in range(len(graph)-1):
+            sum = abs(graph[i] - graph[i+1])
+
+        print(sum)
+
     def recognition(self, path):
 
         basicGraph = self.getBasicGraph(path)
+
+        basicGraph = self.changeAmplitude(basicGraph, 3)
 
         # 정규화
         normalizeGraph = self.normalization(basicGraph)
@@ -424,33 +598,74 @@ class SpeechRecognition:
         firstIndex = groupList[0][0]
         secondIndex = groupList[1][0]
 
+        # if firstIndex == 5:
+        #     if secondIndex == 6:
+        #         below25 = self.getBelow25Ratio(calculateGraph)
+        #         left, right = self.getLRBelow10Ratio(calculateGraph)
+        #         print(path, " : ", left, ", ", right)
+        #         first, second, third = self.threeQuartersRatio(calculateGraph)
+        #
+        #         if first >= 40:
+        #             print("8")
+        #         elif below25 <= 75:
+        #             print("6")
+        #         elif left < 10 and right < 10:
+        #             print("0")
+        #         else:
+        #             print("4")
+        #     else:
+        #         areaRatio = self.getAreaRatio(calculateGraph)
+        #         below25 = self.getBelow25Ratio(calculateGraph)
+        #         first, second, third = self.threeQuartersRatio(calculateGraph)
+        #
+        #         if areaRatio >= 85:
+        #             print("9")
+        #         elif second >= 50:
+        #             print("5")
+        #         elif below25 <= 75:
+        #             print("1")
+        #         else:
+        #             print("3")
+        # else:
+        #     left, right = self.twoHalves(calculateGraph)
+        #
+        #     if left < right:
+        #         print("2")
+        #     else:
+        #         print("7")
+
+        print("예상 숫자 : ", end='')
         if firstIndex == 5:
             if secondIndex == 6:
                 below25 = self.getBelow25Ratio(calculateGraph)
+                first, second, third = self.threeQuartersRatio(calculateGraph)
                 left, right = self.getLRBelow10Ratio(calculateGraph)
-                first, second, third = self.threeQuartersRatio(calculateGraph)
 
-                if first >= 40:
-                    print("8")
-                elif below25 <= 75:
+                if below25 < 80:
                     print("6")
-                elif left < 10 and right < 10:
-                    print("0")
                 else:
-                    print("4")
+                    if first >= 45:
+                        print("8")
+                    else:
+                        if left < 10 and right < 10:
+                            print("0")
+                        else:
+                            print("4")
             else:
-                areaRatio = self.getAreaRatio(calculateGraph)
+                areaRatio = self.getAreaRatio2(calculateGraph)
                 below25 = self.getBelow25Ratio(calculateGraph)
-                first, second, third = self.threeQuartersRatio(calculateGraph)
+                left, right = self.twoHalves(calculateGraph)
 
-                if areaRatio >= 85:
-                    print("9")
-                elif second >= 50:
-                    print("5")
-                elif below25 <= 75:
-                    print("1")
+                if below25 < 75:
+                    if areaRatio < 61:
+                        print("1")
+                    else:
+                        print("9")
                 else:
-                    print("3")
+                    if left < right:
+                        print("3")
+                    else:
+                        print("5")
         else:
             left, right = self.twoHalves(calculateGraph)
 

@@ -7,9 +7,10 @@ speech = speech.SpeechRecognition()
 test = test.Test()
 
 for i in range(10):
-    file = '00' + str(i)
+    file = '0' + str(i)
     print("file : ", file)
-    speech.recognition(file)
+    # speech.recognition(file)
+    speech.printTestValue(file)
 
 # while(True):
 #

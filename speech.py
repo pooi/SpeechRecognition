@@ -551,6 +551,40 @@ class SpeechRecognition:
 
         return left, right
 
+    def getSixPartRatio(self, graph):
+        sum = 0
+        sum1 = 0
+        sum2 = 0
+        sum3 = 0
+        sum4 = 0
+        sum5 = 0
+        sum6 = 0
+        for i in range(len(graph)):
+            c = abs(graph[i])
+            if i < len(graph) * 1 / 6:
+                sum1 += c
+            elif i < len(graph) * 2 / 6:
+                sum2 += c
+            elif i < len(graph) * 3 / 6:
+                sum3 += c
+            elif i < len(graph) * 4 / 6:
+                sum4 += c
+            elif i < len(graph) * 5 / 6:
+                sum5 += c
+            else:
+                sum6 += c
+            sum += c
+
+        list = []
+        list.append(round(sum1/sum*100, 2))
+        list.append(round(sum2/sum*100, 2))
+        list.append(round(sum3/sum*100, 2))
+        list.append(round(sum4/sum*100, 2))
+        list.append(round(sum5/sum*100, 2))
+        list.append(round(sum6/sum*100, 2))
+
+        return list
+
     def threeQuartersRatio(self, graph):
         sum = 0
         sum1 = 0
@@ -575,6 +609,37 @@ class SpeechRecognition:
             sum = abs(graph[i] - graph[i+1])
 
         print(sum)
+
+    def printTestValue(self, path):
+
+        basicGraph = self.getBasicGraph(path)
+
+        basicGraph = self.changeAmplitude(basicGraph, 3)
+
+        # 정규화
+        normalizeGraph = self.normalization(basicGraph)
+
+        # 누적 그래프의 기울기 리스트
+        slopeGraph = self.getGraphAccumulateSlopeList(normalizeGraph)
+
+        # 실제 소리부분 그래프 추출
+        graph = self.findRealGraph(normalizeGraph, slopeGraph)
+
+        groupList = self.getFFTAreaRatio(graph)
+        below25 = self.getBelow25Ratio(graph)
+        first, second, third = self.threeQuartersRatio(graph)
+        left, right = self.getLRBelow10Ratio(graph)
+        twoLeft, twoRight = self.twoHalves(graph)
+        area = self.getAreaRatio2(graph)
+        list = self.getSixPartRatio(graph)
+
+        print("푸리에 그룹 비율 : ", groupList)
+        print("2등분 sample 비율 : ", twoLeft, ", ", twoRight)
+        print("3등분 sample 비율 : ", first, ", ", second, ", ", third)
+        print("6등분 sample 비율 : ", list)
+        print("25이하 비율 : ", below25)
+        print("8각형 영역 넓이 비율 : ", area)
+
 
     def recognition(self, path):
 

@@ -20,13 +20,20 @@ while(True):
     # 정규화
     normalizeGraph = speech.normalization(basicGraph)
 
+    accum = speech.getAccumulateList(normalizeGraph)
+
     # 누적 그래프의 기울기 리스트
     slopeGraph = speech.getGraphAccumulateSlopeList(normalizeGraph)
 
     # 실제 소리부분 그래프 추출
     calculateGraph = speech.findRealGraph(normalizeGraph, slopeGraph)
 
-    speech.getCircle(calculateGraph)
+    f = open(path + '.txt', 'w')
+    for i in range(len(normalizeGraph)):
+        f.write(str(normalizeGraph[i]) + "\n")
+    f.close()
+
+    # speech.getCircle(calculateGraph)
 
     # speech.recognition(path)
 

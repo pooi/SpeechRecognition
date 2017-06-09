@@ -489,6 +489,8 @@ class SpeechRecognition:
         areaList[6] = area6/area * 100
         areaList[7] = area7/area * 100
 
+        # print(areaList)
+
         return areaList
 
     def twoHalves(self, graph):
@@ -640,12 +642,199 @@ class SpeechRecognition:
         print("25이하 비율 : ", below25)
         print("8각형 영역 넓이 비율 : ", area)
 
+    def printFFTGraph(self, path):
+
+        basicGraph = self.getBasicGraph(path)
+
+        basicGraph = self.changeAmplitude(basicGraph, 4)
+
+        # 정규화
+        normalizeGraph = self.normalization(basicGraph)
+
+        # 누적 그래프의 기울기 리스트
+        slopeGraph = self.getGraphAccumulateSlopeList(normalizeGraph)
+
+        # 실제 소리부분 그래프 추출
+        calculateGraph = self.findRealGraph(normalizeGraph, slopeGraph)
+
+        cal = []
+        for i in range(len(calculateGraph)):
+            if i < max(2000,len(calculateGraph)/3):
+                cal.append(calculateGraph[i])
+
+        lf = abs(np.fft.rfft(cal))# / len(calculateGraph)
+        # lf = abs(np.fft.rfft(calculateGraph))
+        list = lf.tolist()
+
+        # max = 0
+        # for i in range(len(list)):
+        #     if list[i] > max:
+        #         max = list[i]
+        #
+        # for i in range(len(list)):
+        #     list[i] = list[i] / max * 100
+        #
+        # for i in range(len(list)):
+        #     list[i] = pow(list[i], 2)
+
+        # print(self.getGroupNumber(calculateGraph))
+
+        sum = 0
+        sum1 = 0
+        sum2 = 0
+        sum3 = 0
+
+        for i in range(len(list)):
+            if i < 90:
+                sum1 += list[i]
+            elif i <= 300:
+                sum2 += list[i]
+            else:
+                sum3 += list[i]
+            sum += list[i]
+
+        print("area1 : %5.2f area2 : %5.2f area3 : %5.2f"%(sum1/sum*100, sum2/sum*100, sum3/sum*100 ))
+
+        # self.printSpectrumGraph(list, title=path, isSaveImg=False)
+
+    def isGroupOne(self, list):
+
+        sum = 0
+        sum1 = 0
+        sum2 = 0
+
+        for i in range(len(list)):
+            if i > 700:
+                sum1 += list[i]
+            sum += list[i]
+
+        if sum1/sum*100 > 45:
+            return True
+        else:
+            return False;
+
+    def isGroupTwo(self, list):
+
+        sum = 0
+        sum1 = 0
+
+        for i in range(len(list)):
+            if 170 < i and i < 800:
+                sum1 += list[i]
+            sum += list[i]
+
+        if sum1/sum*100 > 60:
+            return True
+        else:
+            return False
+
+    def getGroupNumber(self, flist):
+        cal = []
+        # 중성까지만 대략적으로 추출
+        for i in range(len(flist)):
+            if i < max(2000, len(flist) / 3):
+                cal.append(flist[i])
+
+        lf = abs(np.fft.rfft(cal))  # / len(calculateGraph)
+        # lf = abs(np.fft.rfft(calculateGraph))
+        list = lf.tolist()
+
+
+        sum = 0
+        sum1 = 0
+        sum2 = 0
+        sum3 = 0
+
+        for i in range(len(list)):
+            if i < 90:
+                sum1 += list[i]
+            elif i <= 300:
+                sum2 += list[i]
+            else:
+                sum3 += list[i]
+            sum += list[i]
+
+        first = round(sum1/sum*100,2)
+        second = round(sum2/sum*100,2)
+        third = round(sum3/sum*100,2)
+
+        if max(first, second, third) == third:
+            return 1
+        elif max(first, second, third) == second:
+            return 2
+        else:
+            return 3
 
     def recognition(self, path):
 
         basicGraph = self.getBasicGraph(path)
 
-        basicGraph = self.changeAmplitude(basicGraph, 3)
+        basicGraph = self.changeAmplitude(basicGraph, 0.01)
+
+        # 정규화
+        normalizeGraph = self.normalization(basicGraph)
+
+        # 누적 그래프의 기울기 리스트
+        slopeGraph = self.getGraphAccumulateSlopeList(normalizeGraph)
+
+        # 실제 소리부분 그래프 추출
+        calculateGraph = self.findRealGraph(normalizeGraph, slopeGraph)
+
+        # 푸리에 변환
+        # lf = abs(np.fft.rfft(calculateGraph))
+        # flist = lf.tolist()
+        groupNumber = self.getGroupNumber(calculateGraph)
+        # print(groupNumber)
+
+        print("예상 숫자 : ", end='')
+        if groupNumber == 1:#self.isGroupOne(flist): # 1, 2, 7
+            below25 = self.getBelow25Ratio(calculateGraph)
+            left, right = self.getLRBelow10Ratio(calculateGraph)
+
+            if below25 > 75:
+                print("7")
+            else:
+                if left < 10:
+                    print("2")
+                elif right < 10:
+                    print("1")
+                else:
+                    print("not find")
+
+        elif groupNumber == 2:#self.isGroupTwo(flist): # 3, 4, 8
+            left, right = self.twoHalves(calculateGraph)
+            first, second, third = self.threeQuartersRatio(calculateGraph)
+
+            if left > 70:
+                print("8")
+            else:
+                if second > 50:
+                    print("4")
+                else:
+                    print("3")
+
+        else: # 0, 5, 6, 9
+            area = self.getAreaRatio2(calculateGraph)
+            left, right = self.twoHalves(calculateGraph)
+            first, second, third = self.threeQuartersRatio(calculateGraph)
+
+            if area > 60:
+                print("9")
+            else:
+                if left < right:
+                    print("6")
+                else:
+                    if second < 58:
+                        print("5")
+                    else:
+                        print("0")
+
+
+    def recognition2(self, path):
+
+        basicGraph = self.getBasicGraph(path)
+
+        basicGraph = self.changeAmplitude(basicGraph, 0.01)
 
         # 정규화
         normalizeGraph = self.normalization(basicGraph)
@@ -663,43 +852,9 @@ class SpeechRecognition:
         firstIndex = groupList[0][0]
         secondIndex = groupList[1][0]
 
-        # if firstIndex == 5:
-        #     if secondIndex == 6:
-        #         below25 = self.getBelow25Ratio(calculateGraph)
-        #         left, right = self.getLRBelow10Ratio(calculateGraph)
-        #         print(path, " : ", left, ", ", right)
-        #         first, second, third = self.threeQuartersRatio(calculateGraph)
-        #
-        #         if first >= 40:
-        #             print("8")
-        #         elif below25 <= 75:
-        #             print("6")
-        #         elif left < 10 and right < 10:
-        #             print("0")
-        #         else:
-        #             print("4")
-        #     else:
-        #         areaRatio = self.getAreaRatio(calculateGraph)
-        #         below25 = self.getBelow25Ratio(calculateGraph)
-        #         first, second, third = self.threeQuartersRatio(calculateGraph)
-        #
-        #         if areaRatio >= 85:
-        #             print("9")
-        #         elif second >= 50:
-        #             print("5")
-        #         elif below25 <= 75:
-        #             print("1")
-        #         else:
-        #             print("3")
-        # else:
-        #     left, right = self.twoHalves(calculateGraph)
-        #
-        #     if left < right:
-        #         print("2")
-        #     else:
-        #         print("7")
 
-        print("예상 숫자 : ", end='')
+
+        # print("(", end='')
         if firstIndex == 5:
             if secondIndex == 6:
                 below25 = self.getBelow25Ratio(calculateGraph)
@@ -707,15 +862,15 @@ class SpeechRecognition:
                 left, right = self.getLRBelow10Ratio(calculateGraph)
 
                 if below25 < 80:
-                    print("6")
+                    print("(6)")
                 else:
                     if first >= 45:
-                        print("8")
+                        print("(8)")
                     else:
                         if left < 10 and right < 10:
-                            print("0")
+                            print("(0)")
                         else:
-                            print("4")
+                            print("(4)")
             else:
                 areaRatio = self.getAreaRatio2(calculateGraph)
                 below25 = self.getBelow25Ratio(calculateGraph)
@@ -723,20 +878,22 @@ class SpeechRecognition:
 
                 if below25 < 75:
                     if areaRatio < 61:
-                        print("1")
+                        print("(1)")
                     else:
-                        print("9")
+                        print("(9)")
                 else:
                     if left < right:
-                        print("3")
+                        print("(3)")
                     else:
-                        print("5")
+                        print("(5)")
         else:
             left, right = self.twoHalves(calculateGraph)
 
             if left < right:
-                print("2")
+                print("(2)")
             else:
-                print("7")
+                print("(7)")
+
+
 
 

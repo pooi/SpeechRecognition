@@ -7,10 +7,14 @@ speech = speech.SpeechRecognition()
 test = test.Test()
 
 for i in range(10):
+    # if i == 3 or i == 4 or i == 8:
+    #     continue
     file = '0' + str(i)
-    print("file : ", file)
+    print("File : ", file, ".wav")
     # speech.recognition(file)
-    speech.printTestValue(file)
+    # speech.printTestValue(file)
+    # speech.printFFTGraph(file)
+    speech.recognition(file)
 
 # while(True):
 #

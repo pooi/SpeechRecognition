@@ -18,6 +18,12 @@ class SpeechRecognition:
         signal = spf.readframes(-1)
         signal = np.fromstring(signal, 'Int16')
 
+        # list = signal.tolist();
+        # f = open(fileName + '.txt', 'w')
+        # for i in range(len(list)):
+        #     f.write(str(list[i]) + "\n")
+        # f.close()
+
         return signal.tolist()
 
     def printSpectrumGraph(self, list, title='title', isSaveImg=False):
@@ -77,102 +83,6 @@ class SpeechRecognition:
 
         return line
 
-    # def getArea(self, list):
-    #     """
-    #     4개의 직선의 방적식으로 둘러싸인 영역의 넓이를 구하는 함수
-    #     :param list: 파형 그래프
-    #     :return: 영역의 넓이 값
-    #     """
-    #     start = {}  # 시작 x,y 좌표
-    #     finish = {}  # 종료 x,y 좌표
-    #     max = {}  # 최댓값 x,y 좌표
-    #     min = {}  # 최소값 x,y 좌표
-    #
-    #     start['x'] = 0
-    #     start['y'] = list[0]
-    #     # start[0] = list[0]
-    #     finish['x'] = len(list) - 1
-    #     finish['y'] = list[len(list) - 1]
-    #     # finish[len(list) - 1] = list[len(list) - 1]
-    #
-    #     maxValue = 0
-    #     minValue = 0
-    #
-    #     for i in range(len(list)):
-    #         s = int(list[i])
-    #
-    #         if maxValue < s:
-    #             max.clear()
-    #             max['x'] = i
-    #             max['y'] = s
-    #             # max[i] = s
-    #             maxValue = s
-    #
-    #         if minValue > s:
-    #             min.clear()
-    #             min['x'] = i
-    #             min['y'] = s
-    #             # min[i] = s
-    #             minValue = s
-    #
-    #             # print("x : ", i, ", y : ", sig[i])
-    #
-    #     # print(start)
-    #     # print(finish)
-    #     # print(max)
-    #     # print(min)
-    #
-    #     lineLT = self.getLineFunc(start, max)  # find left-top line
-    #     lineRT = self.getLineFunc(max, finish)  # find right-top line
-    #     lineLB = self.getLineFunc(start, min)  # find left-bottom line
-    #     lineRB = self.getLineFunc(min, finish)  # find right-bottom line
-    #
-    #     # print(lineLT)
-    #     # print(lineRT)
-    #     # print(lineLB)
-    #     # print(lineRB)
-    #
-    #     # calculate total area
-    #     totalArea = 0.0
-    #     totalGraph = []
-    #
-    #     for i in range(len(list)):
-    #
-    #         line1 = {}
-    #         line2 = {}
-    #
-    #         # find current top line from two top line
-    #         topMax = lineLT['max']
-    #         if i < topMax:
-    #             line1 = lineLT
-    #         else:
-    #             line1 = lineRT
-    #
-    #         # find current bottom line from two bottom line
-    #         botMax = lineLB['max']
-    #         if i < botMax:
-    #             line2 = lineLB
-    #         else:
-    #             line2 = lineRB
-    #
-    #         topA = line1['a']  # top line 기울기
-    #         topB = line1['b']  # top line y절편
-    #
-    #         botA = line2['a']  # bottom line 기울기
-    #         botB = line2['b']  # bottom line y절편
-    #
-    #         # y = ax + b
-    #         topDistance = topA * i + topB
-    #         botDistance = botA * i + botB
-    #
-    #         area = abs(topDistance) + abs(botDistance)
-    #
-    #         totalArea += area
-    #         totalGraph.append(totalArea)  # option
-    #
-    #     # printGraph(totalGraph, title=file) # option
-    #
-    #     return totalArea
 
     def getArea2(self, list):
         """
@@ -769,7 +679,7 @@ class SpeechRecognition:
 
         basicGraph = self.getBasicGraph(path)
 
-        basicGraph = self.changeAmplitude(basicGraph, 0.01)
+        # basicGraph = self.changeAmplitude(basicGraph, 0.01)
 
         # 정규화
         normalizeGraph = self.normalization(basicGraph)

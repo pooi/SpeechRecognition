@@ -4,10 +4,16 @@
 <br>
 
 ## Overview
+한 음절로 녹음된 음성을 인식하는 프로그램입니다.<br>각 녹음 파일은 숫자를 발음하고 있습니다.<br>이 프로그램은 다른 음성으로 시도할 경우 정확한 인식이 불가능할 수 있습니다.
+
+It is a program that recognizes the voice recorded with one syllable.<br>
+Each recording file say a number.<br>
+This program may not be able to recognize correctly if you try with another voice.
 
 
 <br><br>
 ## Feature
+Please refer to <a href="https://drive.google.com/open?id=0B67FssKXYIKQdjhxR2pRYlAzX28">this</a> file.
 
 
 <br><br>
